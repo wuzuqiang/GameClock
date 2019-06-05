@@ -150,8 +150,8 @@ namespace GameClock.ProjectClass
             string content = "";
             content += ctrlClock.RingTime.ToStandardTimeStr().RightFormatLen(ClockListRowItemWidth.RingTime);
             content += ctrlClock.TaskContent.RightFormatLen(ClockListRowItemWidth.TaskContent);
-            content += ctrlClock.Interval.ToString().RightFormatLen(ClockListRowItemWidth.Interval);
-            content += ctrlClock.Status.RightFormatLen(ClockListRowItemWidth.Status); ;
+            content += ctrlClock.Interval.ToYMDFormat().ToString().RightFormatLen(ClockListRowItemWidth.Interval);
+            content += ctrlClock.Status.RightFormatLen(ClockListRowItemWidth.Status);
             content += ctrlClock.ID.RightFormatLen(ClockListRowItemWidth.ID);
             return content;
         }
@@ -164,7 +164,7 @@ namespace GameClock.ProjectClass
             int num = row.Substring(ClockListRowItemWidth.RingTime).GetHanziNum();
             OperedClock.TaskContent = row.Substring(ClockListRowItemWidth.RingTime, ClockListRowItemWidth.TaskContent - num - 1).Trim();
             OperedClock.Interval = row.Substring(ClockListRowItemWidth.RingTime + ClockListRowItemWidth.TaskContent - num
-                  , ClockListRowItemWidth.Interval - 1).ToInt32();
+                  , ClockListRowItemWidth.Interval - 1).ToSumSecond();
             OperedClock.Status = row.Substring(ClockListRowItemWidth.RingTime + ClockListRowItemWidth.TaskContent + ClockListRowItemWidth.Interval
                     - num
                   , ClockListRowItemWidth.Status - 1).Trim();

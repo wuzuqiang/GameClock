@@ -32,6 +32,38 @@ namespace GameClock
             return i;
         }
 
+        /// <summary>
+        /// 将秒数转换X天X时X分X秒
+        /// </summary>
+        /// <param name="iSecond"></param>
+        /// <returns></returns>
+        public static string ToYMDFormat(this int iSumSecond)
+        {
+            string strYMD = "0天0时0分0秒";
+            int iDay, iHour, iMinute, iSecond;
+            iDay = iSumSecond / (24 * 60 * 60);
+            iHour = iSumSecond / (60 * 60) - iDay * 24;
+            iMinute = iSumSecond / 60 - iDay * 24 * 60 - iHour * 60;
+            iSecond = iSumSecond - iDay * 24 * 60 * 60 - iHour * 60 * 60 - iMinute * 60;
+            strYMD = string.Format("{0}天{1}时{2}分{3}秒", iDay, iHour, iMinute, iSumSecond);
+            return strYMD;
+        }
+
+        /// <summary>
+        /// 将X天X时X分X秒转换为共Y秒
+        /// </summary>
+        /// <param name="strYMD"></param>
+        /// <returns></returns>
+        public static int ToSumSecond(this string strYMD)
+        {
+            int iDay, iHour, iMinute, iSecond;
+            iDay = strYMD.Substring(0, strYMD.IndexOf('天')).ToInt32();
+            iHour = strYMD.Substring(strYMD.IndexOf('天') + 1, strYMD.IndexOf('时')).ToInt32();
+            iMinute = strYMD.Substring(strYMD.IndexOf('时') + 1, strYMD.IndexOf('分')).ToInt32();
+            iSecond = strYMD.Substring(strYMD.IndexOf('分') + 1, strYMD.IndexOf('秒')).ToInt32();
+            int iSumSecond = (iDay * 24 * 60 * 60 + iHour * 60 * 60 + iMinute * 60 + iSecond);
+            return iSumSecond;
+        }
         public static string RightFormatLen(this string str, int width, char replaceChar = ' ')
         {
             string result = "";
