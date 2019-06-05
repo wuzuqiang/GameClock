@@ -1,0 +1,210 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{FCD489AC-AB53-4C92-B705-A0C097978379}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GameClock</RootNamespace>
+    <AssemblyName>GameClock</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Resources\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Common.cs" />
+    <Compile Include="ExtUtil.cs" />
+    <Compile Include="FileHelper.cs" />
+    <Compile Include="FrmProcessing.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmProcessing.Designer.cs">
+      <DependentUpon>FrmProcessing.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FrmWait.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmWait.Designer.cs">
+      <DependentUpon>FrmWait.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Main.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Main.Designer.cs">
+      <DependentUpon>Main.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="ProjectClass\Clock.cs" />
+    <Compile Include="ProjectClass\ClockListRowItemWidth.cs" />
+    <Compile Include="ProjectClass\LogTextHelper.cs" />
+    <Compile Include="ProjectClass\ThreadHelper.cs" />
+    <Compile Include="ProjectClass\WavToTaskcontent.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="FrmSetClock.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmSetClock.Designer.cs">
+      <DependentUpon>FrmSetClock.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FrmSetIntervalTime.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmSetIntervalTime.Designer.cs">
+      <DependentUpon>FrmSetIntervalTime.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FrmSetTime.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmSetTime.Designer.cs">
+      <DependentUpon>FrmSetTime.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TempClass.cs" />
+    <Compile Include="TestManyThread.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TestManyThread.Designer.cs">
+      <DependentUpon>TestManyThread.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TestShowInfo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TestShowInfo.Designer.cs">
+      <DependentUpon>TestShowInfo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TestThreadpool.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TestThreadpool.Designer.cs">
+      <DependentUpon>TestThreadpool.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WavPlayer.cs" />
+    <EmbeddedResource Include="FrmProcessing.resx">
+      <DependentUpon>FrmProcessing.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmWait.resx">
+      <DependentUpon>FrmWait.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Main.resx">
+      <DependentUpon>Main.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <EmbeddedResource Include="FrmSetClock.resx">
+      <DependentUpon>FrmSetClock.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmSetIntervalTime.resx">
+      <DependentUpon>FrmSetIntervalTime.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmSetTime.resx">
+      <DependentUpon>FrmSetTime.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestManyThread.resx">
+      <DependentUpon>TestManyThread.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestShowInfo.resx">
+      <DependentUpon>TestShowInfo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestThreadpool.resx">
+      <DependentUpon>TestThreadpool.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="bin\Debug\WavReflectTaskcontent.txt" />
+    <Content Include="Image\MenuIcon\101.ico" />
+    <Content Include="Image\MenuIcon\102.ico" />
+    <Content Include="Image\MenuIcon\103.ICO" />
+    <Content Include="Image\MenuIcon\104.ico" />
+    <Content Include="Image\MenuIcon\105.ico" />
+    <Content Include="Image\MenuIcon\106.ICO" />
+    <Content Include="Image\MenuIcon\107.ico" />
+    <Content Include="Image\MenuIcon\201.ico" />
+    <Content Include="Image\MenuIcon\202.ico" />
+    <Content Include="Image\MenuIcon\203.ico" />
+    <Content Include="Image\MenuIcon\204.ICO" />
+    <Content Include="Image\MenuIcon\205.ico" />
+    <Content Include="Image\MenuIcon\206.ico" />
+    <Content Include="Image\MenuIcon\207.ICO" />
+    <Content Include="Image\MenuIcon\301.ico" />
+    <Content Include="Image\MenuIcon\302.ico" />
+    <Content Include="Image\MenuIcon\303.ico" />
+    <Content Include="InfoSaved\历史闹钟信息.txt" />
+    <Content Include="InfoSaved\要响铃的闹钟信息.txt" />
+    <Content Include="InfoSaved\需要控制的闹钟信息.txt" />
+    <Content Include="Resources\Newtonsoft.Json.dll" />
+    <Content Include="WavReflectTaskcontent.txt" />
+    <None Include="Resources\2772086457.gif" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
