@@ -25,7 +25,6 @@ namespace GameClock
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            changedFirstring += RingClock;
             Clock clc = new Clock();
             listBox1.Items.Clear();
             //List<string> listContent = FileHelper.getContentList("./InfoSaved/历史闹钟信息.txt");
@@ -49,10 +48,6 @@ namespace GameClock
                     }
                     listControlClock.Add(clk);
                 }
-            }
-            if( -1 != indexFirstRing)
-            {
-                m_RingSet.firstRingClock = ControledClock.GetCtrlClockFromRowString(listContent[indexFirstRing]);
             }
             BindListBox();
         }
@@ -95,11 +90,10 @@ namespace GameClock
                 };
                 listControlClock.Add(operedClock);
                 //将闹钟添加进闹钟集合
-                if(operedClock.Status != "Stop")
-                    m_RingSet.AddAndSetfirstring(operedClock);
+                if (operedClock.Status != "Stop")
+                    BeginRingClock(operedClock);
                 //将添加闹钟事件记录在闹钟历史信息中
                 FileHelper.AddControledClockInfoToHistoryFile(operedClock, "新增");
-                JudgeRestartring();
                 BindListBox();
             }
         }
@@ -112,7 +106,6 @@ namespace GameClock
                 return;
             }
             FrmSetClock dlg = new FrmSetClock();
-            dlg.listExistedClk = m_RingSet.listOrderedRingControledClock;
             dlg.operType = "Edit";
             //获取项目ID
             string row = listBox1.SelectedItem.ToString();
@@ -141,25 +134,20 @@ namespace GameClock
                         {   //原先是暂停状态就不会存在于闹钟集里 //如果新闹钟又是启动状态，则可以添加，反之无需添加
                             if ("Start" == operedClock.Status)
                             {
-                                m_RingSet.AddAndSetfirstring(operedClock);
+                                BeginRingClock(operedClock);
                             }
                         }
                         else
                         {   //原先是开始状态
                             if ("Start" == operedClock.Status)
                             {
-                                m_RingSet.UpdateRingControledClock(operedClock);
-                            }
-                            else
-                            {   //停止状态，需要从响铃集合中移除这项
-                                m_RingSet.RemoveRingControledClock(operedClock.ID);
+                                BeginRingClock(operedClock);
                             }
                         }
                         FileHelper.AddControledClockInfoToHistoryFile(operedClock, "编辑：");
                         break;
                     }
                 }
-                JudgeRestartring();
                 BindListBox();
             }
         }
@@ -219,64 +207,25 @@ namespace GameClock
                 MessageBox.Show("恭喜，初始化要响铃的闹钟信息成功！");
             }
             listControlClock = new List<ControledClock>();
-            m_RingSet = new RingClockSet();
-            m_UsingRingtime = "";
             BindListBox();
         }
-
-        public delegate void ChangedFirstringHandle();
-        public event ChangedFirstringHandle changedFirstring;
-        /// <summary>
-        /// 是否需要重新响铃，判断依据：第一闹钟被改变
-        /// </summary>
-        public void JudgeRestartring()
-        {   //是否已经变动了最新响铃，需要重新改变响铃？
-            int iNeedRingNum = 0;
-            if(0 == m_RingSet.listOrderedRingControledClock.Count())
-            {   //都没闹钟要响，不用响铃
-
-            }
-            else if ((m_UsingRingtime != m_RingSet.firstRingClock.RingTime.ToStandardTimeStr()))
-            {   //第一闹钟被改变
-                //changedFirstring();   //没必要委托了
-                RingClock();
-            }
-
-        }
-        /// <summary>
-        /// 原先要响铃的时间，和Ringset.Ringtime保持一致，那东西是类会自动赋值的
-        /// </summary>
-        string m_UsingRingtime = (new DateTime()).ToStandardTimeStr();
-        RingClockSet m_RingSet = new RingClockSet();
         Thread worker;
         private void btnStartRing_Click(object sender, EventArgs e)
         {
-            RingClock();
+            ControledClock clk = new ControledClock();
+            BeginRingClock(clk);
         }
-        object locker = new object();
 
         SynchronizationContext m_SynContext = null;
-        private void RingClock()
+        private void BeginRingClock(ControledClock clk)
         {   //如何保证  运行时占用内存小；到响铃时还能快速响应。
             //占用内存小，控制方法：不循环；不拼命在堆栈上创建变量
             //响铃时能快速响应，控制方法：系统等着这件事情发生就马上执行；。涉及到系统运行程序的运行机制，时间片。
-            textBox1.Text = string.Format("准备响铃，时间为{0}", m_RingSet.firstRingClock.RingTime.ToStandardTimeStr());
+            //textBox1.Text = string.Format("需要响铃，时间为{0}", clk.RingTime);
             worker = new Thread(new ParameterizedThreadStart(ClockRing));
-            worker.Start();
+            worker.Start(clk);
             //worker.IsBackground = true;
         }
-        private void NewRingThread()
-        {
-
-        }
-        /// <summary>
-        /// 闹钟ID可以映射到执行ID
-        /// </summary>
-        Dictionary<string, string> dicClockidToExcuteid = new Dictionary<string, string>();
-        /// <summary>
-        /// 取消的闹钟ID的映射ID。在更改某闹钟时，此list要从词典中依据闹钟ID找出映射ID，然后移除它，线程才知道不能继续进行下去了
-        /// </summary>
-        List<string> listNeedExcuteid = new List<string>();
         private void ClockRing(object obj)
         {
             try
@@ -287,6 +236,7 @@ namespace GameClock
                 string ID = "";
                 string taskContent = "";
                 int interval = 0;
+                string excuteId = clk.ExcuteId;
                 ringTime = clk.RingTime;
                 ID = clk.ID;
                 taskContent = clk.TaskContent;
@@ -294,18 +244,30 @@ namespace GameClock
                 //LogTextHelper.WriteLine("ClockRing:\t" + JsonConvert.SerializeObject(m_RingSet.firstRingClock));
                 DateTime dtNow = DateTime.Now;
                 #endregion
-                m_UsingRingtime = ringTime.ToStandardTimeStr();    //将此闹钟设置为正在使用标志
                 //休眠到响铃时间
                 Thread.Sleep(ringTime - dtNow);
                 //睡醒之后，如果突然发现：咦，你这闹钟变了。因为变了之后是使用另外的线程去响铃了，这线程被抛弃了。停止他
-                //如果已经能进行到下面了，
                 #region 
-                if (!listNeedExcuteid.Contains(dicClockidToExcuteid[ID]))
-                {
-                    //需要执行的ThreadId不存在
-                    return;
-                }
+                if(ringTime != clk.RingTime)
+                { return; }
                 #endregion
+                #region  如果在响铃之前这闹钟已经被删除或被停止了，那么也没必要往下执行这线程了
+                bool bRingClockExist = false;
+                foreach (ControledClock temp in listControlClock)
+                {
+                    if (ID == temp.ID)
+                    {
+                        bRingClockExist = true;
+                        if(temp.Status == "Stop")   //如果被改成暂停了也没必要往下执行
+                        {
+                            bRingClockExist = false;
+                        }
+                    }
+                }
+                if (!bRingClockExist)
+                { return; }
+                #endregion
+                //其实这里最好要锁住那个响铃闹钟，防止刚好响铃时，那个闹钟被更改
                 //开始响铃
                 RingClockSet.MciStartRing(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "wav\\" + WavToTaskcontent.GetWavfilename(taskContent)));
                 //闹钟依据间隔继续使用？
@@ -313,7 +275,7 @@ namespace GameClock
                 #region 继续响铃？
                 if (DialogResult.Yes == MessageBox.Show(tips, "继续响铃？", MessageBoxButtons.YesNo))
                 {   //修改响铃闹钟集以及控制闹钟列表
-                    FileHelper.AddControledClockInfoToHistoryFile(m_RingSet.firstRingClock, "响铃后继续");
+                    FileHelper.AddControledClockInfoToHistoryFile(clk, "响铃后继续");
                     //更新listBoxControledClock，新信息显示在listBox1
                     for (int i = 0; i < listControlClock.Count(); i++)
                     {
@@ -321,28 +283,37 @@ namespace GameClock
                         {
                             listControlClock[i].RingTime = ringTime.AddSeconds(interval);   //如果加上了interval，还是小于当前时间，怎么处理？？
                             listControlClock[i].Status = "Start";
-                            m_RingSet.UpdateRingControledClock(listControlClock[i]);
+                            if(ringTime.AddSeconds(interval) < DateTime.Now.AddSeconds(1))  //给1秒运行时间
+                            {
+                                MessageBox.Show("抱歉！设置的闹铃时间已过！自动为您停止！");
+                                listControlClock[i].Status = "Stop";
+                                m_SynContext.Post(SetListBoxSafePost, "");
+                                RingClockSet.MciStopRing(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "wav\\" + WavToTaskcontent.GetWavfilename(taskContent)));
+                            }
+                            else
+                            {
+                                m_SynContext.Post(SetListBoxSafePost, "");
+                                RingClockSet.MciStopRing(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "wav\\" + WavToTaskcontent.GetWavfilename(taskContent)));
+                                //ClockRing(listControlClock[i]);   //这种方式想着不用创建线程更节省内存，但会造成MciRing函数只响上一次未响完的那一段。
+                                BeginRingClock(listControlClock[i]);    //线程中重启线程
+                            }
                         }
                     }
-                    m_SynContext.Post(SetListBoxSafePost, "");
-                    RingClockSet.MciStopRing(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "wav\\" + WavToTaskcontent.GetWavfilename(taskContent)));
-                    ClockRing(0);
                 }
                 else
                 {
                     //从响铃闹钟类中移除闹钟，并设置此闹钟状态为停止
-                    m_RingSet.RemoveRingControledClock(ID);
-                    FileHelper.AddControledClockInfoToHistoryFile(m_RingSet.firstRingClock, "响铃后不继续");
+                    FileHelper.AddControledClockInfoToHistoryFile(clk, "响铃后不继续");
                     //更新listBoxControledClock，新信息显示在listBox1
                     for (int i = 0; i < listControlClock.Count(); i++)
                     {
                         if (ID == listControlClock[i].ID)
                         {
                             listControlClock[i].Status = "Stop";
+                            m_SynContext.Post(SetListBoxSafePost, "");
+                            RingClockSet.MciStopRing(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "wav\\" + WavToTaskcontent.GetWavfilename(taskContent)));
                         }
                     }
-                    m_SynContext.Post(SetListBoxSafePost, "");
-                    RingClockSet.MciStopRing(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "wav\\" + WavToTaskcontent.GetWavfilename(taskContent)));
                 }
                 #endregion
             }
@@ -409,8 +380,6 @@ namespace GameClock
             clk.Status = "Start";
             clk.TaskContent = "添加先于原有的闹钟";
             listControlClock.Add(clk);
-            m_RingSet.AddAndSetfirstring(clk);
-            JudgeRestartring();
             FileHelper.AddControledClockInfoToHistoryFile(clk, "测试时，添加打断原有进程的闹钟。。。");
             BindListBox();
         }
@@ -437,8 +406,6 @@ namespace GameClock
             }
             if(removeIndex != listControlClock.Count)
                 listControlClock.RemoveAt(removeIndex);
-            m_RingSet.RemoveRingControledClock(temp.ID);
-            JudgeRestartring();
             BindListBox();
         }
     }

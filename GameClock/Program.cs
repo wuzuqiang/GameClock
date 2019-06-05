@@ -16,12 +16,13 @@ namespace GameClock
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new TestManyThread());
+            Application.Run(new Main());
             Application.ThreadException += Application_ThreadException;
         }
 
         static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
         {
+            //23333333333rewfdskdlsjfdslfdkls
             throw new NotImplementedException();
         }
     }

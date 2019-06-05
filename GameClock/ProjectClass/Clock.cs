@@ -143,6 +143,8 @@ namespace GameClock.ProjectClass
     {
         public Int32 Interval = 0;
         public string Status = "Null";
+        //闹铃时要使用的线程ID
+        public string ExcuteId = System.Guid.NewGuid().ToString();
         public static string FormatControlledClock(ControledClock ctrlClock)
         {
             string content = "";

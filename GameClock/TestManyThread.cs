@@ -25,11 +25,15 @@ namespace GameClock
         int iNum = 1;
         private void button1_Click(object sender, EventArgs e)
         {
-            m_Worker = new Thread(new ParameterizedThreadStart(RingBeingreadyMciPlay));
-            m_Worker.Start(iNum);
-            //m_Worker.IsBackground = true;
-            //RingBeingreadyMciPlay(iNum);
-            iNum += 1;
+            //if (iNum <= 760)
+            {
+                m_Worker = new Thread(new ParameterizedThreadStart(RingBeingreadyMciPlay));
+                m_Worker.Name = "Workerthread" + iNum;
+                m_Worker.Start(iNum);
+                //m_Worker.IsBackground = true;
+                //RingBeingreadyMciPlay(iNum);
+                iNum += 1;
+            }
         }
         SynchronizationContext m_SynContext = null;
         private void RingBeingready(object threadNum)
@@ -46,8 +50,10 @@ namespace GameClock
         {
             try
             {
+
                 m_SynContext.Post(SetRichTextSafePost, threadNum + "-1");
-                //Thread.Sleep(4000);
+                Thread.Sleep(4000);
+                Thread.CurrentThread.Join();
                 WavPlayer.mciPlay(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("wav\\第{0}次测试.wav", ((int)threadNum) % 5 + 1).ToString()));
                 //SetRichTextSafePost(threadNum);
                 //Thread.CurrentThread.Abort();
@@ -152,6 +158,30 @@ namespace GameClock
         {   //终止线程
             m_Worker.Abort();
             richTextBox1.Text += DateTime.Now + "m_Worker.Abort();" + "\r\n";
+        }
+
+        List<Thread> m_ListWorkerThread = new List<Thread>();
+        private void button4_Click(object sender, EventArgs e)
+        {   //新增线程保存于List   好查看如果线程中执行另外一个线程，前一个线程会自动清理掉，不占用内存吗
+            m_Worker = new Thread(new ParameterizedThreadStart(UseListThreadRingBeingready));
+            m_Worker.Name = "Workerthread" + iNum;
+            m_Worker.Start(iNum);
+            m_ListWorkerThread.Add(m_Worker);
+            //m_Worker.IsBackground = true;
+            //RingBeingreadyMciPlay(iNum);
+            iNum += 1;
+
+        }
+        private void UseListThreadRingBeingready(object threadNum)
+        {
+            #region 线程里面重新调用启动线程
+            if (iNum < 100)
+            {
+                m_SynContext.Post(SetRichTextSafePost, threadNum + "-1");
+                button4_Click(null, null);
+            }
+            #endregion
+            return;
         }
     }
 }
