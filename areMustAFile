@@ -1,4 +1,5 @@
 aaaaaafffff
 2019年6月5日11:43:44
 在本地和服务器上都添加SSH key之后
-在本机删除SSH key
+在本机删除SSH key。结果RESULT：本机还是可以正常对GameClock项目做各种事情。
+添加分支Dev1后，将其设置为默认分支，但在GitHub desktop中对项目使用master分支进行操作，不知道结果如何。
